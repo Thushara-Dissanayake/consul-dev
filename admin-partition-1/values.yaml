@@ -1,0 +1,74 @@
+#--------------------------------- HCP Consul Cluster ---------------------------------
+global:
+  name: consul
+  enabled: false
+  datacenter: consul-cluster-2
+  # image: hashicorp/consul-enterprise:1.14.0-ent
+  image: hashicorp/consul:1.15.2
+  imageConsulDataplane: hashicorp/consul-dataplane:1.1.0
+  imageK8S: hashicorp/consul-k8s-control-plane:1.1.1
+  adminPartitions:
+    enabled: true
+    name: "part1"
+  acls:
+    manageSystemACLs: true
+    bootstrapToken:
+      secretName: consul-bootstrap-token
+      secretKey: token
+  tls:
+    enabled: true
+    # caCert:
+    #   secretKey: caCert
+    #   secretName: consul-ca-cert
+    # enableAutoEncrypt: true
+  enableConsulNamespaces: true
+
+externalServers:
+  enabled: true
+  hosts:
+  - consul-cluster-2.private.consul.8110724f-247b-41cf-b90b-e43bc0762646.aws.hashicorp.cloud
+  httpsPort: 443
+  useSystemRoots: true
+  k8sAuthMethodHost: https://57131D4509D5B795B706D325E3013E81.gr7.eu-central-1.eks.amazonaws.com
+
+server:
+  enabled: false
+
+dns:
+  enabled: true
+  enableRedirection: true
+
+# syncCatalog:
+#   enabled: true
+#   toK8S: true
+#   toConsul: true
+
+connectInject:
+  default: true
+  namespaceSelector: |
+    matchExpressions:
+      - key: "kubernetes.io/metadata.name"
+        operator: "In"
+        values: ["default", "consul"]
+
+meshGateway:
+  enabled: true
+  service:
+    annotations: |
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internal
+      service.beta.kubernetes.io/aws-load-balancer-type: nlb
+      service.beta.kubernetes.io/aws-load-balancer-name: "MehsGW-NLB-part1"
+
+ingressGateways:
+  enabled: true
+  defaults:
+    replicas: 1
+    service:
+      type: LoadBalancer
+      ports:
+        - port: 9002
+      annotations: |
+        service.beta.kubernetes.io/aws-load-balancer-type: external
+        service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+        service.beta.kubernetes.io/aws-load-balancer-name: "App-NLB-part1"

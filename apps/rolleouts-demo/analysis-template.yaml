@@ -1,0 +1,79 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: http-success-rate-analysis
+  namespace: test
+spec:
+  args:
+    - name: loadBalancerFullName
+  metrics:
+    - name: http-success-rate-analysis
+      interval: 1m
+      successCondition: "all(result[0].Values, {# >= 0.95})"
+      failureLimit: 1
+      provider:
+        cloudWatch:
+          interval: 1m
+          metricDataQueries:
+          - {
+            "id": "successRate",
+            "expression": "(allRequests - errors4XX - errors5XX) / allRequests"
+            }
+          - {
+            "id": "errors4XX",
+            "metricStat": {
+              "metric": {
+                "namespace": "AWS/ApplicationELB",
+                "metricName": "HTTPCode_Target_4XX_Count",
+                "dimensions": [
+                  {
+                    "name": "LoadBalancer",
+                    # "value": "{{`app/{{args.loadBalancerFullName }}`}}"
+                    "value": "app/rollouts-demo-ingress/1b1b32e4502e42d0"
+                  }
+                ]
+              },
+              "period": 60,
+              "stat": "Sum",
+              "unit": "Count"
+            },
+            "returnData": false
+            }
+          - {
+            "id": "errors5XX",
+            "metricStat": {
+              "metric": {
+                "namespace": "AWS/ApplicationELB",
+                "metricName": "HTTPCode_Target_5XX_Count",
+                "dimensions": [
+                  {
+                    "name": "LoadBalancer",
+                    "value": "app/rollouts-demo-ingress/1b1b32e4502e42d0"
+                  }
+                ]
+              },
+              "period": 60,
+              "stat": "Sum",
+              "unit": "Count"
+            },
+            "returnData": false
+            }
+          - {
+            "id": "allRequests",
+            "metricStat": {
+              "metric": {
+                "namespace": "AWS/ApplicationELB",
+                "metricName": "RequestCount",
+                "dimensions": [
+                  {
+                    "name": "LoadBalancer",
+                    "value": "app/rollouts-demo-ingress/1b1b32e4502e42d0"
+                  }
+                ]
+              },
+              "period": 60,
+              "stat": "Sum",
+              "unit": "Count"
+            },
+            "returnData": false
+            }

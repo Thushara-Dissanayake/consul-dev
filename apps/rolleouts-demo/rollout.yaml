@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-demo
+spec:
+  replicas: 5
+  strategy:
+    canary:
+      stableService:  rollouts-service-v1
+      canaryService:  rollouts-service-v2
+      trafficRouting:
+        alb:
+          ingress:  rollouts-demo-ingress
+          rootService:  rollouts-service
+          servicePort: 80
+      steps:
+        - setWeight: 20
+        - pause: {}
+        - setWeight: 50
+        - pause: {duration: 10}
+      analysis:
+        templates:
+          - templateName: http-success-rate-analysis
+        args:
+          # - name: loadBalancerFullName
+          #   valueFrom:
+          #     fieldRef:
+          #       fieldPath: status.alb.loadBalancer.fullName
+          - name: loadBalancerFullName
+            value:  app/rollouts-demo-ingress/cb27f9c1b6bf7804
+
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: rollouts-demo
+  template:
+    metadata:
+      labels:
+        app: rollouts-demo
+    spec:
+      containers:
+      - name: rollouts-demo
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        # image: argoproj/rollouts-demo:green
+        image: argoproj/rollouts-demo:bad-red #Gives 5xx errors

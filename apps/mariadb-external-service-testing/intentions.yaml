@@ -1,0 +1,32 @@
+# apiVersion: consul.hashicorp.com/v1alpha1
+# kind: ServiceDefaults
+# metadata:
+#   name: mariadb
+# spec:
+#   protocol: tcp
+#   destination:
+#     addresses:
+#       - "db-1.c5mqbengbhqr.eu-central-1.rds.amazonaws.com"
+#     port: 3306
+
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: TerminatingGateway
+metadata:
+  name: terminating-gateway
+spec:
+  services:
+    - name: mariadb
+
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: mariadb
+spec:
+  destination:
+    name: mariadb
+  sources:
+    - name: "*"
+      action: allow
+

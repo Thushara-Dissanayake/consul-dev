@@ -1,0 +1,21 @@
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: apigw-frontend
+spec:
+  destination:
+    name: dashboard
+  sources:
+    - name: api-gateway
+      action: allow
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: front-back
+spec:
+  destination:
+    name: counting
+  sources:
+    - name: dashboard
+      action: allow

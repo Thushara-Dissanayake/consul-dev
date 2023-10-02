@@ -1,0 +1,41 @@
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: Mesh
+metadata:
+  name: mesh
+spec:
+  transparentProxy:
+    meshDestinationsOnly: true
+  allowEnablingPermissiveMutualTLS: true
+
+---
+# apiVersion: consul.hashicorp.com/v1alpha1
+# kind: TerminatingGateway
+# metadata:
+#   name: terminating-gateway
+# spec:
+#   services:
+#     - name: swisscom
+
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: swisscom
+spec:
+  destination:
+    name: swisscom
+  sources:
+    - name: '*'
+      action: allow
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: deny-all
+spec:
+  destination:
+    name: '*'
+  sources:
+    - name: '*'
+      action: allow
+

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nw-multitool
+  name: nw-multitool
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nw-multitool
+  template:
+    metadata:
+      name: nw-multitool
+      annotations:
+        kubernetes.io/psp: eks.privileged
+      labels:
+        app: nw-multitool
+    spec:
+      serviceAccountName: nw-multitool
+      containers:
+      - args:
+        - /bin/bash
+        image: praqma/network-multitool
+        imagePullPolicy: Always
+        name: nw-multitool
+        stdin: true
+        stdinOnce: true
+        tty: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nw-multitool
+  name: nw-multitool
+spec:
+  type: NodePort
+  selector:
+    app: nw-multitool
+  ports:
+  - protocol: TCP
+    name: nwtool
+    port: 9099
+    targetPort: 9099
+

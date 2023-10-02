@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: web-request
+spec:
+  args:
+  - name: rollouts-service
+  metrics:
+  - name: webmetric
+    successCondition: result == true
+    provider:
+      web:
+        url: "http://rollouts-demo-ingress-269223714.eu-central-1.elb.amazonaws.com/"
+        timeoutSeconds: 5 # defaults to 10 seconds
+        headers:
+          - key: x-canary-target
+            value: "v2"
+        jsonPath: "{$.data.ok}"

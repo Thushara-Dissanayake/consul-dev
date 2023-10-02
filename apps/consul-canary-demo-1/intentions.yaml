@@ -1,0 +1,30 @@
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: apigw-ui
+spec:
+  destination:
+    name: ui
+  sources:
+    - name: api-gateway
+      action: allow
+
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: ui-to-web
+spec:
+  destination:
+    name: web
+  sources:
+    - name: ui
+      permissions:
+        - action: allow
+          http:
+            pathExact: /
+            methods: ["GET"]
+        - action: allow
+          http:
+            pathExact: /favicon.ico
+            methods: ["GET"]

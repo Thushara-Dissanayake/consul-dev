@@ -1,0 +1,62 @@
+#--------------------------------- HCP Consul Cluster ---------------------------------
+global:
+  name: consul
+  enabled: false
+  datacenter: consul-cluster
+  # image: hashicorp/consul-enterprise:1.14.0-ent
+  image: hashicorp/consul:1.15.2
+  imageConsulDataplane: hashicorp/consul-dataplane:1.1.0
+  imageK8S: hashicorp/consul-k8s-control-plane:1.1.1
+  acls:
+    manageSystemACLs: true
+    bootstrapToken:
+      secretName: consul-bootstrap-token
+      secretKey: token
+  tls:
+    enabled: true
+    # caCert:
+    #   secretKey: caCert
+    #   secretName: consul-ca-cert
+    # enableAutoEncrypt: true
+  enableConsulNamespaces: true
+  metrics:
+    enabled: true
+
+externalServers:
+  enabled: true
+  hosts:
+  - consul-cluster.private.consul.8110724f-247b-41cf-b90b-e43bc0762646.aws.hashicorp.cloud
+  httpsPort: 443
+  useSystemRoots: true
+  k8sAuthMethodHost: https://E26BFEAEA2761759C7E4E22E87FA7986.gr7.eu-central-1.eks.amazonaws.com
+
+server:
+  enabled: false
+
+connectInject:
+  default: true
+  namespaceSelector: |
+    matchExpressions:
+      - key: "kubernetes.io/metadata.name"
+        operator: "In"
+        values: ["default", "consul", "testkube"]
+  # metrics:
+  #   defaultEnableMerging: true
+
+apiGateway:
+  enabled: true
+  image: hashicorp/consul-api-gateway:0.5.3
+  imageEnvoy: envoyproxy/envoy:v1.25.1
+  managedGatewayClass:
+    serviceType: NodePort
+    useHostPorts: true
+
+ingressGateways:
+  enabled: true
+  defaults:
+    replicas: 1
+    service:
+      type: LoadBalancer
+      annotations: |
+        service.beta.kubernetes.io/aws-load-balancer-type: external
+        service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing

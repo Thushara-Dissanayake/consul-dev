@@ -1,0 +1,9 @@
+{
+    "command": [
+      "curl",
+      "http://k8s-consul-consulin-e0748af4bd-a6a4bfc2f2e98a5d.elb.eu-central-1.amazonaws.com:8080/",
+      "-H",
+      "'Accept: application/json'"
+    ],
+    "expected_status": "200"
+  }

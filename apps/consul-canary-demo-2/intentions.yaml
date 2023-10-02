@@ -1,0 +1,10 @@
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: apigw-rollouts-service
+spec:
+  destination:
+    name: rollouts-service
+  sources:
+    - name: api-gateway
+      action: allow

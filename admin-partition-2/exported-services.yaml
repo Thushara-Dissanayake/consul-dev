@@ -1,0 +1,15 @@
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ExportedServices
+metadata:
+  name: part2
+spec:
+  services:
+  - name: mesh-gateway
+    namespace: default
+    consumers:
+    - partition: part1
+  - name: counting
+    namespace: default
+    consumers:
+    - partition: part1
+     

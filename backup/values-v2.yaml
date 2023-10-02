@@ -1,0 +1,82 @@
+#--------------------------------- HCP Consul Cluster ---------------------------------
+global:
+  name: consul
+  enabled: false
+  # Change the DC name (HCP Cluster name) accordingly!
+  datacenter: consul-cluster-2
+  adminPartitions:
+    enabled: true
+    name: hashicups
+  image: hashicorp/consul:1.16.0-ent
+  imageConsulDataplane: hashicorp/consul-dataplane:1.2.0
+  imageK8S: hashicorp/consul-k8s-control-plane:1.2.0
+
+#k create secret generic "consul-bootstrap-token" --from-literal="token=9e8caff3-664d-d95a-c687-33c04cc37d48" --namespace consul
+#k create secret generic consul-ca-cert --from-file="caCert=ca.pem" --namespace consul
+  acls:
+    manageSystemACLs: true
+    bootstrapToken:
+      secretName: consul-bootstrap-token
+      secretKey: token
+  tls:
+    enabled: true
+    caCert:
+      secretKey: caCert
+      secretName: consul-ca-cert
+    enableAutoEncrypt: true
+  enableConsulNamespaces: true
+  metrics:
+    enabled: true
+
+externalServers:
+  enabled: true
+  hosts:
+  - consul-cluster-2.private.consul.02889ef6-56a7-4301-a848-6a77811c08ad.aws.hashicorp.cloud
+  httpsPort: 443
+  useSystemRoots: true
+  k8sAuthMethodHost: https://1E6B285C588EDE9E5594DBD6146DBC85.gr7.eu-central-1.eks.amazonaws.com
+
+server:
+  enabled: false
+
+dns:
+  enabled: true
+  enableRedirection: true
+
+connectInject:
+  default: true
+  namespaceSelector: |
+    matchExpressions:
+      - key: "kubernetes.io/metadata.name"
+        operator: "In"
+        values: ["default", "consul"]
+  # metrics:
+  #   defaultEnableMerging: true
+  apiGateway:
+    managedGatewayClass:
+      serviceType: NodePort
+      # serviceType: LoadBalancer
+      # copyAnnotations: 
+      #   service.beta.kubernetes.io/aws-load-balancer-type: external
+      #   service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+
+terminatingGateways:
+  enabled: true
+  
+ingressGateways:
+  enabled: true
+  defaults:
+    replicas: 1
+    service:
+      type: LoadBalancer
+      annotations: |
+        service.beta.kubernetes.io/aws-load-balancer-type: external
+        service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+
+meshGateway:
+  enabled: false
+  service:
+    annotations: |
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internal
+      service.beta.kubernetes.io/aws-load-balancer-type: nlb

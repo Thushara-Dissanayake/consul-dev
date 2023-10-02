@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  annotations:
+    #alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-central-1:340842203147:certificate/1d0ae33a-dd97-4fb5-be56-24f9da4672e1
+    alb.ingress.kubernetes.io/load-balancer-name: app-lb
+    #external-dns.alpha.kubernetes.io/hostname: damage-report-2.340842203147-dam-network.icp.corproot.net
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    #alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 9002}]'
+spec:
+  ingressClassName: alb
+  rules:
+    - #host: "damage-report-2.340842203147-dam-network.icp.corproot.net"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80

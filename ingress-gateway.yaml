@@ -1,0 +1,15 @@
+#Host header must be there when access service through ingress GW
+#eg: curl --header "Host: nginx.ingress.default.consul-cluster-2.consul" "http://k8s-consul-consulin-8218a308e5-e7ae4aed4d393948.elb.eu-central-1.amazonaws.com:8080/"
+
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: IngressGateway
+metadata:
+  name: ingress-gateway
+  namespace: default
+spec:
+  listeners:
+    - port: 8080 #This is the port of ALB not the port of app
+      protocol: http #since protocol is http, we can use different port other than 8080 for the application (for tcp ALB port and app port must be same)
+      services:
+        - name: nginx
+          namespace: default

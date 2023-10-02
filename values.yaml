@@ -1,0 +1,58 @@
+#--------------------------------- Self managed Consul Cluster ---------------------------------
+
+# helm upgrade consul hashicorp/consul  --create-namespace -n consul -f values.yaml --version 1.2.0  --install
+
+
+global:
+  name: consul
+  enabled: true
+  datacenter: dc1
+  image: hashicorp/consul:1.16.0
+  imageConsulDataplane: hashicorp/consul-dataplane:1.2.0
+  imageK8S: hashicorp/consul-k8s-control-plane:1.2.0
+
+  acls:
+    manageSystemACLs: true
+  tls:
+    enabled: false
+  metrics:
+    enabled: true
+
+server:
+ enabled: true
+ replicas: 3
+
+connectInject:
+  default: true
+  enabled: true
+  # Consul will only be allowed to inject sidecars in these namespaces.
+  namespaceSelector: |
+    matchExpressions:
+      - key: "kubernetes.io/metadata.name"
+        operator: "In"
+        values: ["default", "consul"] 
+  apiGateway:
+    manageExternalCRDs: true
+    managedGatewayClass:
+      serviceType: NodePort
+
+terminatingGateways:
+  enabled: true
+
+meshGateway:
+  enabled: false
+  service:
+    annotations: |
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internal
+      service.beta.kubernetes.io/aws-load-balancer-type: nlb
+
+ui:
+ enabled: true
+ service:
+   enabled: true
+   type: LoadBalancer
+   annotations: |
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-name: consul-lb
