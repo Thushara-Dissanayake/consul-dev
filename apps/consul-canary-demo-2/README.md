@@ -1,5 +1,5 @@
-# ****************** Automated Canary Releases with Consul using ArgoRollout and Gateway API ********************
-# Permissive mTLS has enabled for the direct header-based routing from ALB
+# Automated Canary Releases with Consul using ArgoRollout + Gateway API 
+# Permissive mTLS has enabled for header-based routing from ALB
 
 1. Install ArgoRollout
 
