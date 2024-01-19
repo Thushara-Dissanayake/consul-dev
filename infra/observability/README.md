@@ -10,13 +10,13 @@ helm repo update grafana
 
 3. 
 k create ns observability
-helm install -f prometheus-values.yaml prometheus prometheus-community/prometheus --version "15.5.3" --namespace observability
+helm install -f prometheus-values.yaml prometheus prometheus-community/prometheus --version "15.5.3" --create-namespace --namespace observability
 or
-helm upgrade -f prometheus-values.yaml prometheus prometheus-community/prometheus --version "22.6.2" --namespace observability --install
+helm upgrade -f prometheus-values.yaml prometheus prometheus-community/prometheus --version "22.6.2" --create-namespace --namespace observability --install
 
-helm install -f grafana-values.yaml grafana grafana/grafana --version "6.23.1" --namespace observability 
+helm install -f grafana-values.yaml grafana grafana/grafana --version "6.23.1" --create-namespace --namespace observability 
 or
-helm upgrade -f grafana-values.yaml grafana grafana/grafana --version "6.56.6" --namespace observability --install
+helm upgrade -f grafana-values.yaml grafana grafana/grafana --version "6.56.6" --create-namespace --namespace observability --install
 
 4. 
 k port-forward -n observability svc/grafana 3000:3000
@@ -30,6 +30,8 @@ Restart all the app pods to be updated with with propper prometheus annotations
 
 6. 
 Login and set Grafana data source to http://prometheus-server.observability.svc.cluster.local
+    unsername: admin
+    password: kubectl get secret --namespace observability grafana -o jsonpath="{.data.admin-password}" | base64 --decode
 
 7. 
 Test:

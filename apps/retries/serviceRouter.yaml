@@ -1,0 +1,18 @@
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceRouter
+metadata:
+  name: fake-service # Must be same as the service name or ServiceResolver/ServiceSplitter name
+spec:
+  routes:
+    # - match:
+    #     http:
+    #       # methods: ['GET']
+    #       # pathPrefix: '/'
+    #       # pathExact: '/'
+    #       pathRegex: '.*'
+    - destination:
+        service: fake-service # Service name or ServiceResolver/ServiceSplitter name
+        requestTimeout: 15s
+        numRetries: 5
+        retryOnConnectFailure: true
+        retryOn: [5xx]

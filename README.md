@@ -5,8 +5,8 @@
 # New VPC, private/public subnets, IGW will be created  
 a. 
 eksctl create cluster \
---version 1.27 \
---name cluster-1 \
+--version 1.28 \
+--name cluster-3 \
 --region eu-central-1 \
 --nodegroup-name ng \
 --node-type t3.medium \
@@ -17,8 +17,8 @@ eksctl create cluster \
 --vpc-nat-mode Disable
 
 b.
-export CLUSTER="cluster-1"
-export ACCOUNT_ID="775964700675"
+export CLUSTER="cluster-3"
+export ACCOUNT_ID="981300975944"
 
 2. Install CSI plugin
 
@@ -114,9 +114,9 @@ k create secret generic consul-ca-cert --from-file="caCert=ca.pem" --namespace c
 
 helm repo add hashicorp https://helm.releases.hashicorp.com && helm repo update hashicorp
 
-helm install consul hashicorp/consul --version 1.2.0 -f values.yaml --create-namespace --namespace consul
+helm install consul hashicorp/consul --version 1.3.1 -f values.yaml --create-namespace --namespace consul
 or
-helm upgrade consul hashicorp/consul --version 1.2.0 -f values.yaml --namespace consul --install 
+helm upgrade consul hashicorp/consul --version 1.3.1 -f values.yaml --namespace consul --install 
 
 5. Deploy demo app
 k apply -f apps/hashicups/
