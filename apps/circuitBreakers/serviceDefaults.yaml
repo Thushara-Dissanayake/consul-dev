@@ -1,0 +1,20 @@
+# This is used to configure Circuit breaking parameters
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: traffic-generator
+spec:
+  protocol: http
+  upstreamConfig:
+    defaults:
+      connectTimeoutMs: 5000
+      # limits:
+      #   maxConnections: 30 # for HTTP/1.1 traffic
+      #   maxPendingRequests: 40 # maximum number of requests that are queued while waiting for a connection to establish
+      #   maxConcurrentRequests: 50 # for HTTP/2 traffic
+      passiveHealthCheck:
+        interval: "5s" # time between checking the upstream service instance availability
+        maxFailures: 100 # number of consecutive failures allowed per check interval
+        enforcingConsecutive5xx: 100 # how many times out of 100 that Consul ejects the service instance when it detects a failed status
+        maxEjectionPercent: 100 # percentage of upstream service instances that Consul ejects when the health check reports a failure
+        baseEjectionTime: "30s" # time that an ejected service instance must remain considered as failed before being considered healthy
